@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import type Task from '../interfaces/task.interface';
+import type { TTaskStatus } from '../types/taskStatus';
+import type { TTaskPriority } from '../types/taskPriority';
 
 interface TaskStore {
   tasks: Task[];
-  create: (id: number, title: string, status?: string, priority?: string, description?: string) => void;
+  create: (id: number, title: string, status?: TTaskStatus, priority?: TTaskPriority, description?: string) => void;
   delete: (id: number) => void;
   getById?: (id: number) => Task | undefined;
   getByStatus: (status: string) => Task[];
@@ -31,7 +33,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       priority: 'MEDIUM',
     },
   ],
-  create: (id: number, title: string, status?: string, priority?: string, description?: string): void => {
+  create: (id: number, title: string, status?: TTaskStatus, priority?: TTaskPriority, description?: string): void => {
     const newTask: Task = {
       id: id,
       title: title,

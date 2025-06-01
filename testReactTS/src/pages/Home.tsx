@@ -202,10 +202,11 @@ export default function Home() {
   const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Task>('createdAt');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const rows = useTaskStore((state) => state.getAll());
+  const [page, setPage] = React.useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
+  const rows = useTaskStore((state) => state.getAll());
+  
   const [open, setOpen] = React.useState<boolean>(false);
   
   const handleClickOpen = () => {
