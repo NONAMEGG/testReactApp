@@ -6,12 +6,12 @@ import type { TTaskPriority } from '../types/taskPriority';
 interface TaskStore {
   tasks: Task[];
   create: (id: number, title: string, status?: TTaskStatus, priority?: TTaskPriority, description?: string) => void;
-  delete: (id: number) => void;
-  getById?: (id: number) => Task | undefined;
+  deleteByIds: (ids: number[]) => void;
   getByStatus: (status: string) => Task[];
   getByPriority: (priority: string) => Task[];
   getAll: () => Task[];
   deleteAll: () => void;
+  getLastId: () => number;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -44,10 +44,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     };
     set((state) => ({ tasks: [...state.tasks, newTask] }));
   },
-  delete: (id: number) => {
+  deleteByIds: (ids: number[]) => {
     set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== id),
+      tasks: state.tasks.filter((task) => !ids.includes(task.id)),
     }));
+  },
+  getLastId: () => {
+    const tasks = get().tasks;
+    return tasks.length > 0 ? Math.max(...tasks.map((task) => task.id)) : 0;
   },
   getById: (id: number) => {
     return get().tasks.find((task) => task.id === id);
