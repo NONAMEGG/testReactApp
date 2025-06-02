@@ -6,15 +6,21 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { alpha } from '@mui/material/styles';
+import type { TTaskStatus } from '../types/taskStatus';
+import type { TTaskPriority } from '../types/taskPriority';
 
+
+type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
 interface EnhancedTableToolbarProps {
   selected: number[];
   numSelected: number;
+  onUnFilter: () => void;
+  filter: Filter;
   clearSelected: () => void;
 }
 
-export default function EnhancedTableToolbar({ selected, numSelected, clearSelected }: EnhancedTableToolbarProps) {
+export default function EnhancedTableToolbar({ selected, numSelected, clearSelected, filter, onUnFilter }: EnhancedTableToolbarProps) {
   const tasksLength = useTaskStore((state) => state.tasks.length);
   const deleteTasks = useTaskStore(
     (state) => numSelected !== tasksLength ? state.deleteByIds : state.deleteAll
@@ -65,7 +71,7 @@ export default function EnhancedTableToolbar({ selected, numSelected, clearSelec
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton onClick={() => filter('LOW')} onDoubleClick={onUnFilter}>
             <FilterListIcon />
           </IconButton>
         </Tooltip>

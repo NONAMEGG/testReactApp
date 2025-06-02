@@ -20,9 +20,13 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
+import type { TTaskPriority } from '../types/taskPriority';
+import type { TTaskStatus } from '../types/taskStatus';
+import { TaskPriority } from './../types/taskPriority';
 
 type Order = 'asc' | 'desc';
 
+type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
 function getComparator<Key extends keyof any>(
   order: Order,
@@ -42,15 +46,36 @@ export default function Home() {
   const [selected, setSelected] = React.useState<number[]>([]);
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-
-  const rows = useTaskStore((state) => state.tasks);
+  const [isFiltered, setIsFiltered] = React.useState<boolean>(false);
+  const [filteredRows, setFilteredRows] = React.useState<Task[]>([]);
+  const rows: Task[] = useTaskStore((state) => state.tasks);
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [curId, setCurId] = React.useState<number | null>(null);
 
+  const filter : Filter = (by) => {
+    const filteredTasks = rows.filter((task) => task.priority === by);
+    setIsFiltered(true);
+    console.log(isFiltered);
+    setFilteredRows(filteredTasks);
+  }
+
+  React.useEffect(() => {
+    if (isFiltered) {
+      filter('LOW');
+    }
+  } 
+  , [rows]);
+
+  const onUnFilter = () => {
+    setIsFiltered(false);
+    console.log('unf');
+  }
+
   const handleClickOpen = () => {
     setOpen(true);
   };
+
 
   const onClose = () => {
     setOpen(false);
@@ -116,18 +141,27 @@ export default function Home() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
   const visibleRows = React.useMemo(
-    () =>
-      [...rows]
-        .sort(getComparator(order, orderBy))
-        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [order, orderBy, page, rowsPerPage, rows],
+    () => {
+      if (isFiltered) {
+        return [...filteredRows]
+          .sort(getComparator(order, orderBy))
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      } else {
+        return [...rows]
+          .sort(getComparator(order, orderBy))
+          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+      }
+
+    },
+    [order, orderBy, page, rowsPerPage, rows, isFiltered, filteredRows]
   );
 
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
-          selected={selected} numSelected={selected.length} clearSelected={clearSelected} />
+          selected={selected} numSelected={selected.length} clearSelected={clearSelected}
+          filter={filter} onUnFilter={onUnFilter}/>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
