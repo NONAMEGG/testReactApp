@@ -12,6 +12,8 @@ interface TaskStore {
   getAll: () => Task[];
   deleteAll: () => void;
   getLastId: () => number;
+  updateTask: (id: number, description: string, title?: string, status?: TTaskStatus, priority?: TTaskPriority) => void;
+  getById: (id: number) => Task | undefined;
 }
 
 export const useTaskStore = create<TaskStore>((set, get) => ({
@@ -65,5 +67,19 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   getAll: () => {
     return get().tasks;
   },
-  deleteAll: () => set({ tasks: [] })
+  deleteAll: () => set({ tasks: [] }),
+  updateTask: (id: number, description: string, title?: string, status?: TTaskStatus, priority?: TTaskPriority) => {
+    set((state) => ({
+      tasks: state.tasks.map((task) => {
+        return task.id === id
+          ? { ...task,
+             title: title || task.title, status: status || task.status,
+              priority: priority || task.priority, 
+              description: description }
+          : task;
+      }
+        
+      ),
+    }));
+  }
 }));

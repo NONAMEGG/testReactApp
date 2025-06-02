@@ -5,7 +5,7 @@ import TaskAddPopup from '../components/TaskAddPopup';
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar';
 import EnhancedTableHead, { descendingComparator } from '../components/EnhancedTableHead';
 
-
+import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -44,15 +44,17 @@ export default function Home() {
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
 
   const rows = useTaskStore((state) => state.tasks);
-  
+
   const [open, setOpen] = React.useState<boolean>(false);
-  
+  const [curId, setCurId] = React.useState<number | null>(null);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
 
   const onClose = () => {
     setOpen(false);
+    setCurId(null);
   }
 
   const clearSelected = () => {
@@ -77,7 +79,7 @@ export default function Home() {
     setSelected([]);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleCheckBoxClick = (event: React.MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
 
@@ -95,6 +97,11 @@ export default function Home() {
     }
     setSelected(newSelected);
   };
+
+  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    setCurId(id);
+    setOpen(true);
+  }
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -119,8 +126,8 @@ export default function Home() {
   return (
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar 
-        selected={selected} numSelected={selected.length} clearSelected={clearSelected} />
+        <EnhancedTableToolbar
+          selected={selected} numSelected={selected.length} clearSelected={clearSelected} />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -143,21 +150,23 @@ export default function Home() {
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row.id)}
                     role="checkbox"
                     aria-checked={isItemSelected}
                     tabIndex={-1}
                     key={row.id}
                     selected={isItemSelected}
                     sx={{ cursor: 'pointer' }}
+                    onDoubleClick={(event) => handleClick(event, row.id)}
                   >
-                    <TableCell padding="checkbox">
+                    <TableCell padding="checkbox"
+                      onClick={(event) => handleCheckBoxClick(event, row.id)}>
                       <Checkbox
                         color="primary"
                         checked={isItemSelected}
                         inputProps={{
                           'aria-labelledby': labelId,
                         }}
+
                       />
                     </TableCell>
                     <TableCell
@@ -170,8 +179,21 @@ export default function Home() {
                     </TableCell>
                     <TableCell align="left">{row.description}</TableCell>
                     <TableCell align="center">{row.createdAt.toLocaleString()}</TableCell>
-                    <TableCell align="center">{row.priority}</TableCell>
-                    <TableCell align="center">{row.status}</TableCell>
+                    <TableCell align="center">
+                      <Chip color={
+                        row.status === 'PENDING' ? 'default' :
+                          row.status === 'IN_PROGRESS' ? 'secondary' : 'success'
+                      }
+                        label={row.status} variant="outlined" />
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip color={
+                        row.priority === 'HIGH' ? 'error' :
+                          row.priority === 'MEDIUM' ? 'warning' : 'primary'
+                      }
+                        label={row.priority} variant="outlined" />
+
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -187,8 +209,8 @@ export default function Home() {
             </TableBody>
           </Table>
         </TableContainer>
-        
-        <TaskAddPopup open={open} onClose={onClose} />    
+
+        <TaskAddPopup open={open} onClose={onClose} taskCurId={curId} />
         <Tooltip title="Add Task">
           <IconButton onClick={handleClickOpen}>
             <AddIcon />
