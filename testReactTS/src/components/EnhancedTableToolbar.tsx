@@ -8,28 +8,40 @@ import Tooltip from '@mui/material/Tooltip';
 import { alpha } from '@mui/material/styles';
 import type { TTaskStatus } from '../types/taskStatus';
 import type { TTaskPriority } from '../types/taskPriority';
-
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import ListSubheader from '@mui/material/ListSubheader';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
 
 type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
 interface EnhancedTableToolbarProps {
   selected: number[];
   numSelected: number;
+  filteredBy: TTaskPriority | TTaskStatus | null;
   onUnFilter: () => void;
   filter: Filter;
   clearSelected: () => void;
+  setFilteredBy: (by: TTaskPriority | TTaskStatus | null) => void;
 }
 
-export default function EnhancedTableToolbar({ selected, numSelected, clearSelected, filter, onUnFilter }: EnhancedTableToolbarProps) {
+export default function EnhancedTableToolbar({ selected, numSelected, filteredBy, clearSelected, filter, onUnFilter, setFilteredBy }: EnhancedTableToolbarProps) {
   const tasksLength = useTaskStore((state) => state.tasks.length);
   const deleteTasks = useTaskStore(
     (state) => numSelected !== tasksLength ? state.deleteByIds : state.deleteAll
   );
 
   const handleDelete = () => {
-        deleteTasks(selected);
-        clearSelected();
-    };
+    deleteTasks(selected);
+    clearSelected();
+  };
+
+  const handleFilter = (by: TTaskPriority | TTaskStatus) => {
+    onUnFilter();
+    setFilteredBy(by);
+    filter(by);
+  };
 
   return (
     <Toolbar
@@ -70,11 +82,24 @@ export default function EnhancedTableToolbar({ selected, numSelected, clearSelec
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton onClick={() => filter('LOW')} onDoubleClick={onUnFilter}>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <>
+      <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+        <InputLabel htmlFor="grouped-select">Filter</InputLabel>
+        <Select defaultValue="" value={filteredBy || ""} id="grouped-select" label="Filter" size="small">
+          <MenuItem value="" onClick={onUnFilter}>
+            <em>Clear filter</em>
+          </MenuItem>
+          <ListSubheader>Current status</ListSubheader>
+          <MenuItem value={'LOW'} onClick={() => handleFilter('LOW')}>Low</MenuItem>
+          <MenuItem value={'MEDIUM'} onClick={() => handleFilter('MEDIUM')}>Medium</MenuItem>
+          <MenuItem value={'HIGH'} onClick={() => handleFilter('HIGH')}>High</MenuItem>
+          <ListSubheader>Current priority</ListSubheader>
+          <MenuItem value={'PENDING'} onClick={() => handleFilter('PENDING')}>Pending</MenuItem>
+          <MenuItem value={'IN_PROGRESS'} onClick={() => handleFilter('IN_PROGRESS')}>In progress</MenuItem>
+          <MenuItem value={'COMPLETED'} onClick={() => handleFilter('COMPLETED')}>Completed</MenuItem>
+        </Select>
+      </FormControl>
+      </>
       )}
     </Toolbar>
   );

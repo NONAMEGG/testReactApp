@@ -3,7 +3,10 @@ import { useTaskStore } from '../stores/taskStore';
 import type Task from '../interfaces/task.interface';
 import TaskAddPopup from '../components/TaskAddPopup';
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar';
-import EnhancedTableHead, { descendingComparator } from '../components/EnhancedTableHead';
+import EnhancedTableHead from '../components/EnhancedTableHead';
+import {TaskPriority} from '../types/taskPriority';
+import {TaskStatus} from '../types/taskStatus';
+import Fab from '@mui/material/Fab';
 
 import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
@@ -22,54 +25,43 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import type { TTaskPriority } from '../types/taskPriority';
 import type { TTaskStatus } from '../types/taskStatus';
-import { TaskPriority } from './../types/taskPriority';
-
-type Order = 'asc' | 'desc';
 
 type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string | Date },
-  b: { [key in Key]: number | string | Date },
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
 export default function Home() {
-  const [order, setOrder] = React.useState<Order>('asc');
   const [orderBy, setOrderBy] = React.useState<keyof Task>('createdAt');
   const [selected, setSelected] = React.useState<number[]>([]);
   const [page, setPage] = React.useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
   const [isFiltered, setIsFiltered] = React.useState<boolean>(false);
   const [filteredRows, setFilteredRows] = React.useState<Task[]>([]);
+  const [filteredBy, setFilteredBy] = React.useState<TTaskPriority | TTaskStatus | null>(null); 
   const rows: Task[] = useTaskStore((state) => state.tasks);
 
   const [open, setOpen] = React.useState<boolean>(false);
   const [curId, setCurId] = React.useState<number | null>(null);
 
   const filter : Filter = (by) => {
-    const filteredTasks = rows.filter((task) => task.priority === by);
+    let filteredTasks: Task[] = [];
+    if (Object.values(TaskPriority).includes(by as TTaskPriority)) {
+      filteredTasks = rows.filter((task) => task.priority === by);
+    } else if (Object.values(TaskStatus).includes(by as TTaskStatus)) {
+      filteredTasks = rows.filter((task) => task.status === by);
+    }
     setIsFiltered(true);
-    console.log(isFiltered);
     setFilteredRows(filteredTasks);
   }
 
   React.useEffect(() => {
     if (isFiltered) {
-      filter('LOW');
+      filter(filteredBy as TTaskPriority | TTaskStatus);
     }
   } 
   , [rows]);
 
   const onUnFilter = () => {
+    setFilteredBy(null);
     setIsFiltered(false);
-    console.log('unf');
   }
 
   const handleClickOpen = () => {
@@ -85,15 +77,6 @@ export default function Home() {
   const clearSelected = () => {
     setSelected([]);
   }
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Task,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -144,16 +127,14 @@ export default function Home() {
     () => {
       if (isFiltered) {
         return [...filteredRows]
-          .sort(getComparator(order, orderBy))
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       } else {
         return [...rows]
-          .sort(getComparator(order, orderBy))
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       }
 
     },
-    [order, orderBy, page, rowsPerPage, rows, isFiltered, filteredRows]
+    [page, rowsPerPage, rows, isFiltered, filteredRows]
   );
 
   return (
@@ -161,7 +142,7 @@ export default function Home() {
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar
           selected={selected} numSelected={selected.length} clearSelected={clearSelected}
-          filter={filter} onUnFilter={onUnFilter}/>
+          filter={filter} onUnFilter={onUnFilter} filteredBy={filteredBy} setFilteredBy={setFilteredBy}/>
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -170,10 +151,7 @@ export default function Home() {
           >
             <EnhancedTableHead
               numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
-              onRequestSort={handleRequestSort}
               rowCount={rows.length}
             />
             <TableBody>
@@ -209,9 +187,15 @@ export default function Home() {
                       scope="row"
                       padding="none"
                     >
-                      {row.title}
+                      {
+                      row.title && row.title.length > 20 ?
+                    row.description.substring(0, 10).concat('...') : row.title
+                      }
                     </TableCell>
-                    <TableCell align="left">{row.description}</TableCell>
+                    <TableCell align="left">{
+                      row.description && row.description.length > 20 ?
+                    row.description.substring(0, 30).concat('...') : row.description
+                    }</TableCell>
                     <TableCell align="center">{row.createdAt.toLocaleString()}</TableCell>
                     <TableCell align="center">
                       <Chip color={
@@ -246,9 +230,10 @@ export default function Home() {
 
         <TaskAddPopup open={open} onClose={onClose} taskCurId={curId} />
         <Tooltip title="Add Task">
-          <IconButton onClick={handleClickOpen}>
+          <Fab sx={{ my: -2 }}
+           onClick={handleClickOpen} color="primary" aria-label="add">
             <AddIcon />
-          </IconButton>
+          </Fab>
         </Tooltip>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}

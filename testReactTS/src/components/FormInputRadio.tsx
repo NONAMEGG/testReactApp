@@ -4,6 +4,7 @@ import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { TaskPriority } from "../types/taskPriority";
 import { TaskStatus } from "../types/taskStatus";
+import FormLabel from '@mui/material/FormLabel';
 
 interface FormInputProps {
     name: string;
@@ -22,12 +23,15 @@ export default function FormInputRadio({name, control, label, radioPropsKind}: F
         field: { onChange, value },
         fieldState: { error },
       }) => (
+        <>
+        <FormLabel id="demo-radio-buttons-group-label">{name}</FormLabel>
         <RadioGroup
         row
         aria-labelledby="demo-row-radio-buttons-group-label"
         name="row-radio-buttons-group"
         onChange={onChange}
         value={value || Object.keys(radioPropsKind)[0]}
+        
       >
         {
             Object.keys(radioPropsKind).map((key, index) => {
@@ -35,6 +39,7 @@ export default function FormInputRadio({name, control, label, radioPropsKind}: F
             })
         }
       </RadioGroup>
+      </>
       )}
     />
     );
