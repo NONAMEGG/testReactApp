@@ -5,11 +5,11 @@ import {
  } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+import type { Filter } from '../types/Filter';
 import type { TTaskStatus } from '../types/taskStatus';
 import type { TTaskPriority } from '../types/taskPriority';
 import { useTaskStore } from './../stores/taskStore';
 
-type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
 interface EnhancedTableToolbarProps {
   selected: number[];

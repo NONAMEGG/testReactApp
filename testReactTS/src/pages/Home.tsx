@@ -1,23 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { ChangeEvent, MouseEvent } from 'react';
+
 import { useTaskStore } from '../stores/taskStore';
 import type Task from '../interfaces/task.interface';
+import { TaskPriority } from '../types/taskPriority';
+import { TaskStatus } from '../types/taskStatus';
+import type { TTaskPriority } from '../types/taskPriority';
+import type { TTaskStatus } from '../types/taskStatus';
+import type { Filter } from '../types/Filter';
+
 import TaskAddPopup from '../components/TaskAddPopup';
 import EnhancedTableToolbar from '../components/EnhancedTableToolbar';
 import EnhancedTableHead from '../components/EnhancedTableHead';
-import {TaskPriority} from '../types/taskPriority';
-import {TaskStatus} from '../types/taskStatus';
-import type { TTaskPriority } from '../types/taskPriority';
-import type { TTaskStatus } from '../types/taskStatus';
 import TaskTableRow from '../components/TaskTableRow';
+
+
 import {
-   Fab, Chip, Box, Table, TableBody, TableCell, TableContainer,
-   TablePagination, TableRow, Paper, Tooltip, Checkbox
+   Fab, Box, Table, TableBody, TableCell, TableContainer,
+   TablePagination, TableRow, Paper, Tooltip
  } from '@mui/material';
+ 
 import AddIcon from '@mui/icons-material/Add';
-
-
-type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
 const Home = () => {
   // const [orderBy, setOrderBy] = useState<keyof Task>('createdAt');
