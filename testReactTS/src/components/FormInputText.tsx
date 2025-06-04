@@ -1,6 +1,8 @@
+import type { FC } from 'react';
+
 import { Controller } from "react-hook-form";
 import TextField from '@mui/material/TextField';
-import TextareaAutosize from '@mui/material/TextareaAutosize';
+
 interface FormInputProps {
     name: string;
     control: any;
@@ -8,7 +10,8 @@ interface FormInputProps {
 }
 
 
-export default function FormInputText({name, control, label}: FormInputProps) {
+const FormInputText: FC<FormInputProps> = ({ name, control, label }) => {
+
     return (
         <Controller
       name={name}
@@ -45,3 +48,5 @@ export default function FormInputText({name, control, label}: FormInputProps) {
     />
     );
 }
+
+export default FormInputText;

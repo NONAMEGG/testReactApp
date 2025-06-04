@@ -1,10 +1,9 @@
+import type { FC } from 'react';
+
 import { Controller } from "react-hook-form";
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import { Radio, RadioGroup, FormControlLabel, FormLabel } from '@mui/material';
 import { TaskPriority } from "../types/taskPriority";
 import { TaskStatus } from "../types/taskStatus";
-import FormLabel from '@mui/material/FormLabel';
 
 interface FormInputProps {
     name: string;
@@ -13,7 +12,7 @@ interface FormInputProps {
     radioPropsKind: typeof TaskPriority |  typeof TaskStatus; 
 }
 
-export default function FormInputRadio({name, control, label, radioPropsKind}: FormInputProps) {
+const FormInputRadio: FC<FormInputProps> = ({ name, control, label, radioPropsKind }) => {
 
     return (
         <Controller
@@ -44,3 +43,5 @@ export default function FormInputRadio({name, control, label, radioPropsKind}: F
     />
     );
 }
+
+export default FormInputRadio;

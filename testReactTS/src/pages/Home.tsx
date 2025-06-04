@@ -1,4 +1,5 @@
-import * as React from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import type { ChangeEvent, MouseEvent } from 'react';
 import { useTaskStore } from '../stores/taskStore';
 import type Task from '../interfaces/task.interface';
 import TaskAddPopup from '../components/TaskAddPopup';
@@ -6,41 +7,31 @@ import EnhancedTableToolbar from '../components/EnhancedTableToolbar';
 import EnhancedTableHead from '../components/EnhancedTableHead';
 import {TaskPriority} from '../types/taskPriority';
 import {TaskStatus} from '../types/taskStatus';
-import Fab from '@mui/material/Fab';
-
-import Chip from '@mui/material/Chip';
-import Box from '@mui/material/Box';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TablePagination from '@mui/material/TablePagination';
-import TableRow from '@mui/material/TableRow';
-
-
-import Paper from '@mui/material/Paper';
-import Checkbox from '@mui/material/Checkbox';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import AddIcon from '@mui/icons-material/Add';
 import type { TTaskPriority } from '../types/taskPriority';
 import type { TTaskStatus } from '../types/taskStatus';
 
+import {
+   Fab, Chip, Box, Table, TableBody, TableCell, TableContainer,
+   TablePagination, TableRow, Paper, Tooltip, Checkbox
+ } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+
+
 type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
-export default function Home() {
-  const [orderBy, setOrderBy] = React.useState<keyof Task>('createdAt');
-  const [selected, setSelected] = React.useState<number[]>([]);
-  const [page, setPage] = React.useState<number>(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState<number>(5);
-  const [isFiltered, setIsFiltered] = React.useState<boolean>(false);
-  const [filteredRows, setFilteredRows] = React.useState<Task[]>([]);
-  const [filteredBy, setFilteredBy] = React.useState<TTaskPriority | TTaskStatus | null>(null); 
+const Home = () => {
+  // const [orderBy, setOrderBy] = useState<keyof Task>('createdAt');
+  const [selected, setSelected] = useState<number[]>([]);
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+  // const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  const [filteredRows, setFilteredRows] = useState<Task[]>([]);
+  const [filteredBy, setFilteredBy] = useState<TTaskPriority | TTaskStatus | null>(null); 
   const rows: Task[] = useTaskStore((state) => state.tasks);
 
-  const [open, setOpen] = React.useState<boolean>(false);
-  const [curId, setCurId] = React.useState<number | null>(null);
-
+  const [open, setOpen] = useState<boolean>(false);
+  const [curId, setCurId] = useState<number | null>(null);
+  
   const filter : Filter = (by) => {
     let filteredTasks: Task[] = [];
     if (Object.values(TaskPriority).includes(by as TTaskPriority)) {
@@ -48,21 +39,17 @@ export default function Home() {
     } else if (Object.values(TaskStatus).includes(by as TTaskStatus)) {
       filteredTasks = rows.filter((task) => task.status === by);
     }
-    setIsFiltered(true);
     setFilteredRows(filteredTasks);
   }
 
-  React.useEffect(() => {
-    if (isFiltered) {
+  useEffect(() => {
+    if (filteredBy) {
       filter(filteredBy as TTaskPriority | TTaskStatus);
     }
   } 
   , [rows]);
 
-  const onUnFilter = () => {
-    setFilteredBy(null);
-    setIsFiltered(false);
-  }
+  const onUnFilter = () => setFilteredBy(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -78,7 +65,7 @@ export default function Home() {
     setSelected([]);
   }
 
-  const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
       const newSelected = rows.map((n) => n.id);
       setSelected(newSelected);
@@ -87,7 +74,7 @@ export default function Home() {
     setSelected([]);
   };
 
-  const handleCheckBoxClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleCheckBoxClick = (event: MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
 
@@ -106,7 +93,7 @@ export default function Home() {
     setSelected(newSelected);
   };
 
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+  const handleClick = (event: MouseEvent<unknown>, id: number) => {
     setCurId(id);
     setOpen(true);
   }
@@ -115,7 +102,7 @@ export default function Home() {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -123,9 +110,9 @@ export default function Home() {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
-  const visibleRows = React.useMemo(
+  const visibleRows = useMemo(
     () => {
-      if (isFiltered) {
+      if (filteredBy) {
         return [...filteredRows]
           .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
       } else {
@@ -134,7 +121,7 @@ export default function Home() {
       }
 
     },
-    [page, rowsPerPage, rows, isFiltered, filteredRows]
+    [page, rowsPerPage, rows, filteredBy, filteredRows]
   );
 
   return (
@@ -248,3 +235,5 @@ export default function Home() {
     </Box>
   );
 }
+
+export default Home;

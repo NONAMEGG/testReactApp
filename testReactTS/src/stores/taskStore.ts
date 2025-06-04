@@ -1,18 +1,16 @@
 import { create } from 'zustand';
 import type Task from '../interfaces/task.interface';
-import type { TTaskStatus } from '../types/taskStatus';
-import type { TTaskPriority } from '../types/taskPriority';
 
 interface TaskStore {
   tasks: Task[];
-  create: (id: number, title: string, status?: TTaskStatus, priority?: TTaskPriority, description?: string) => void;
+  create: (whatToCreate: Partial<Task>) => void;
   deleteByIds: (ids: number[]) => void;
   getByStatus: (status: string) => Task[];
   getByPriority: (priority: string) => Task[];
   getAll: () => Task[];
   deleteAll: () => void;
   getLastId: () => number;
-  updateTask: (id: number, description: string, title?: string, status?: TTaskStatus, priority?: TTaskPriority) => void;
+  updateTask: (id: number, fieldsToUpdate: Partial<Task>) => void;
   getById: (id: number) => Task | undefined;
 }
 
@@ -35,14 +33,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       priority: 'MEDIUM',
     },
   ],
-  create: (id: number, title: string, status?: TTaskStatus, priority?: TTaskPriority, description?: string): void => {
+  create: (whatToCreate): void => {
     const newTask: Task = {
-      id: id,
-      title: title,
+      id: whatToCreate.id || get().getLastId() + 1,
+      title: whatToCreate.title || 'Task ' + (get().getLastId() + 1),
       createdAt: new Date(),
-      description: description || '',
-      status: status || 'PENDING',
-      priority: priority || 'LOW',
+      description: whatToCreate.description || '',
+      status: whatToCreate.status || 'PENDING',
+      priority: whatToCreate.priority || 'LOW',
     };
     set((state) => ({ tasks: [...state.tasks, newTask] }));
   },
@@ -68,17 +66,19 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
     return get().tasks;
   },
   deleteAll: () => set({ tasks: [] }),
-  updateTask: (id: number, description: string, title?: string, status?: TTaskStatus, priority?: TTaskPriority) => {
+  updateTask: (id, fieldsToUpdate) => {
     set((state) => ({
       tasks: state.tasks.map((task) => {
-        return task.id === id
-          ? { ...task,
-             title: title || task.title, status: status || task.status,
-              priority: priority || task.priority, 
-              description: description }
-          : task;
+        if (task.id === id) {
+          if (fieldsToUpdate.title !== '') {
+            return { ...task, ...fieldsToUpdate };
+          } else {
+            fieldsToUpdate.title = task.title;
+            return { ...task, ...fieldsToUpdate };
+          }
+        }
+        return task;
       }
-        
       ),
     }));
   }

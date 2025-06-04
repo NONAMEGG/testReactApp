@@ -1,18 +1,13 @@
-import { useTaskStore } from './../stores/taskStore';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
+import type { FC } from 'react';
+import { 
+  Toolbar, Typography, IconButton, Tooltip, alpha,
+  InputLabel, MenuItem, ListSubheader, FormControl, Select 
+ } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
-import { alpha } from '@mui/material/styles';
+
 import type { TTaskStatus } from '../types/taskStatus';
 import type { TTaskPriority } from '../types/taskPriority';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import ListSubheader from '@mui/material/ListSubheader';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import { useTaskStore } from './../stores/taskStore';
 
 type Filter = (by: TTaskPriority | TTaskStatus) => void;
 
@@ -26,7 +21,8 @@ interface EnhancedTableToolbarProps {
   setFilteredBy: (by: TTaskPriority | TTaskStatus | null) => void;
 }
 
-export default function EnhancedTableToolbar({ selected, numSelected, filteredBy, clearSelected, filter, onUnFilter, setFilteredBy }: EnhancedTableToolbarProps) {
+const EnhancedTableToolbar : FC<EnhancedTableToolbarProps> = 
+({ selected, numSelected, filteredBy, clearSelected, filter, onUnFilter, setFilteredBy }) => {
   const tasksLength = useTaskStore((state) => state.tasks.length);
   const deleteTasks = useTaskStore(
     (state) => numSelected !== tasksLength ? state.deleteByIds : state.deleteAll
@@ -104,3 +100,5 @@ export default function EnhancedTableToolbar({ selected, numSelected, filteredBy
     </Toolbar>
   );
 }
+
+export default EnhancedTableToolbar;

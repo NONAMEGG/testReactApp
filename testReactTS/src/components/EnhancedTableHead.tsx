@@ -1,13 +1,9 @@
+import type { FC } from 'react';
+
 import type Task from '../interfaces/task.interface';
 
-import TableHead from '@mui/material/TableHead';
-import TableSortLabel from '@mui/material/TableSortLabel';
-import TableCell from '@mui/material/TableCell';
-import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
-import Box from '@mui/material/Box';
+import { TableHead, TableCell, TableRow, Checkbox } from '@mui/material';
 
-import { visuallyHidden } from '@mui/utils';
 
 interface HeadCell {
   disablePadding: boolean;
@@ -68,9 +64,9 @@ interface EnhancedTableProps {
   rowCount: number;
 }
 
-export default function EnhancedTableHead(props: EnhancedTableProps) {
-  const { onSelectAllClick, numSelected, rowCount } =
-    props;
+const EnhancedTableHead: FC<EnhancedTableProps> = ({ 
+  onSelectAllClick, numSelected, rowCount
+ }) => {
 
   return (
     <TableHead>
@@ -99,3 +95,5 @@ export default function EnhancedTableHead(props: EnhancedTableProps) {
     </TableHead>
   );
 }
+
+export default EnhancedTableHead;
