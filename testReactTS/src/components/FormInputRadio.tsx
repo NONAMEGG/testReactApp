@@ -8,11 +8,10 @@ import { TaskStatus } from "../types/taskStatus";
 interface FormInputProps {
     name: string;
     control: any;
-    label: string;
     radioPropsKind: typeof TaskPriority |  typeof TaskStatus; 
 }
 
-const FormInputRadio: FC<FormInputProps> = ({ name, control, label, radioPropsKind }) => {
+const FormInputRadio: FC<FormInputProps> = ({ name, control, radioPropsKind }) => {
 
     return (
         <Controller
@@ -20,7 +19,6 @@ const FormInputRadio: FC<FormInputProps> = ({ name, control, label, radioPropsKi
       control={control}
       render={({
         field: { onChange, value },
-        fieldState: { error },
       }) => (
         <>
         <FormLabel id="demo-radio-buttons-group-label">{name}</FormLabel>

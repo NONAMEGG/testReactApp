@@ -90,9 +90,9 @@ const TaskAddPopup: FC<TaskAddPopupProps> = ({ open, onClose, taskCurId }) => {
                         <FormInputText name='title' control={control} label={'title'} />
                         <FormInputText name='description' control={control} label={'description'} />
                         <FormInputRadio name='priority' control={control}
-                            label='priority' radioPropsKind={TaskPriority} />
+                         radioPropsKind={TaskPriority} />
                         <FormInputRadio name='status' control={control}
-                            label='status' radioPropsKind={TaskStatus} />
+                         radioPropsKind={TaskStatus} />
                     </form>
                 </DialogContent>
                 <DialogActions>

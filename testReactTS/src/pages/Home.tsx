@@ -19,7 +19,6 @@ import {
    Fab, Box, Table, TableBody, TableCell, TableContainer,
    TablePagination, TableRow, Paper, Tooltip
  } from '@mui/material';
- 
 import AddIcon from '@mui/icons-material/Add';
 
 const Home = () => {
