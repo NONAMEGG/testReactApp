@@ -2,10 +2,14 @@ import type { FC } from 'react';
 
 import { Controller } from "react-hook-form";
 import TextField from '@mui/material/TextField';
+import type { Control } from "react-hook-form";
+import type { FormInputs } from "../interfaces/formInputs.interface";
+
+
 
 interface FormInputProps {
-    name: string;
-    control: any;
+    name: "title" | "description" | "priority" | "status";
+    control: Control<FormInputs, any, FormInputs> | undefined;
     label: string;
 }
 

@@ -8,26 +8,17 @@ import {
 import FormInputText from './FormInputText';
 import FormInputRadio from './FormInputRadio';
 
-import type { TTaskPriority } from '../types/taskPriority';
-import type { TTaskStatus } from '../types/taskStatus';
 import { TaskPriority } from '../types/taskPriority';
 import { TaskStatus } from '../types/taskStatus';
 import { useTaskStore } from './../stores/taskStore';
 import type Task from '../interfaces/task.interface';
-
+import type { FormInputs } from "../interfaces/formInputs.interface";
 
 
 interface TaskAddPopupProps {
     open: boolean;
     onClose: () => void;
     taskCurId: number | null;
-}
-
-interface FormInputs {
-    title: string;
-    description: string;
-    priority: TTaskPriority;
-    status: TTaskStatus;
 }
 
 const TaskAddPopup: FC<TaskAddPopupProps> = ({ open, onClose, taskCurId }) => {

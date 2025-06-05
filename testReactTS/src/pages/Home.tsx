@@ -76,7 +76,7 @@ const Home = () => {
     setSelected([]);
   };
 
-  const handleCheckBoxClick = (event: MouseEvent<unknown>, id: number) => {
+  const handleCheckBoxClick = (_event: MouseEvent<unknown>, id: number) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected: number[] = [];
 
@@ -95,12 +95,12 @@ const Home = () => {
     setSelected(newSelected);
   };
 
-  const handleClick = (event: MouseEvent<unknown>, id: number) => {
+  const handleClick = (_event: MouseEvent<unknown>, id: number) => {
     setCurId(id);
     setOpen(true);
   }
 
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (_event: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
